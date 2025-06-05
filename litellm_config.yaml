@@ -1,0 +1,93 @@
+model_list:
+  # Your Azure GPT-3.5 with specific ID for final fallback
+  - model_name: gpt-35-turbo
+    litellm_params:
+      model: azure/gpt-35-turbo
+      api_base: "https://litellm-nurix.openai.azure.com/"
+      api_key: "key"
+      timeout: 20                # 20-second timeout for this model
+      stream_timeout: 30         # 30-second timeout for streaming requests
+      max_retries: 2             # Number of retries before falling back
+    model_info:
+      id: "azure-gpt35-fallback"
+  
+  - model_name: gpt-4o
+    litellm_params:
+      model: azure/gpt-4o
+      api_base: "https://litellm-nurix.openai.azure.com/"
+      api_key: "key"
+      timeout: 30                # 30-second timeout (higher for more complex model)
+      stream_timeout: 45         # 45-second stream timeout
+      max_retries: 2
+  
+  # Provider-specific wildcard routing
+  - model_name: "anthropic/*"
+    litellm_params:
+      model: "anthropic/*"
+      api_key: "your-anthropic-api-key"
+      timeout: 25                # 25-second timeout for Anthropic models
+      stream_timeout: 40         # 40-second stream timeout
+      max_retries: 1             # Less retries before falling back
+  
+  - model_name: "gemini/*"
+    litellm_params:
+      model: "gemini/*"
+      api_key: "key"
+      timeout: 15                # 15-second timeout for Gemini models
+      stream_timeout: 25         # 25-second stream timeout
+      max_retries: 2
+      
+  
+  - model_name: "openai/*"
+    litellm_params:
+      model: "openai/*"
+      api_key: "key"
+      stream_timeout: 35         # 35-second stream timeout
+      max_retries: 2
+
+general_settings:
+  master_key: sk-Nurix123
+  database_url: "postgresql://litellmuser:Nurix123@172.31.4.221:5432/litellm"
+  routing_strategy: "weighted-pick"
+  
+  # Global timeout for all requests (fallback if not specified at model level)
+  timeout: 25
+  
+  # Reliability settings
+  num_retries: 3
+  allowed_fails: 2
+  cooldown_time: 60
+  request_timeout: 30  # Global request timeout
+  
+  enable_pre_call_checks: true
+  pass_through_all_models: true
+
+
+litellm_settings:
+  callbacks: ["lago"]
+  # General fallbacks - cascade through models if any error occurs
+  fallbacks: [
+    {"gpt-4o": ["openai/gpt-4o", "anthropic/claude-3-opus-20240229"]},
+    {"openai/*": ["anthropic/*", "gpt-4o", "azure-gpt35-fallback"]},
+    {"anthropic/*": ["openai/*", "gpt-4o", "azure-gpt35-fallback"]},
+    {"gemini/*": ["openai/*", "anthropic/*", "azure-gpt35-fallback"]}
+  ]
+  
+  # Context window fallbacks - for when context is too large
+  context_window_fallbacks: [
+    {"anthropic/claude-3-sonnet-20240229": ["anthropic/claude-3-opus-20240229"]},
+    {"openai/gpt-4": ["openai/gpt-4-turbo"]},
+    {"gpt-4o": ["openai/gpt-4-turbo-128k"]},
+    {"gpt-35-turbo": ["openai/gpt-3.5-turbo-16k"]}
+  ]
+  
+  # Content policy fallbacks - for when content is flagged
+  content_policy_fallbacks: [
+    {"anthropic/*": ["openai/*", "azure-gpt35-fallback"]},
+    {"openai/*": ["anthropic/*", "azure-gpt35-fallback"]},
+    {"gemini/*": ["openai/*", "anthropic/*", "azure-gpt35-fallback"]}
+  ]
+  
+  # Default fallback as final safety net
+  default_fallbacks: ["azure-gpt35-fallback"]
+  

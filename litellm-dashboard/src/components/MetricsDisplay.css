@@ -1,0 +1,73 @@
+.tokens-section {
+  margin-top: 1rem;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  padding: 0.75rem;
+}
+
+.tokens-section h4 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.metric.token {
+  padding: 0.25rem 0;
+}
+
+.metric.token.highlight {
+  background-color: #dbeafe;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}.metrics-display {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.metrics-display h3 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.metrics-display h3 svg {
+  margin-right: 0.5rem;
+}
+
+.metrics {
+  background-color: #f8fafc;
+  border-radius: 4px;
+  padding: 0.75rem;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.metric:last-child {
+  margin-bottom: 0;
+}
+
+.metric.highlight {
+  background-color: #e0f2fe;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.75rem;
+  font-weight: 500;
+}
+
+.metric-label {
+  color: #64748b;
+}
+
+.metric-value {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+}
